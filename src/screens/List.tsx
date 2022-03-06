@@ -20,67 +20,72 @@ import {RootStackParamList} from '../App';
 type Props = StackScreenProps<RootStackParamList, 'List'>;
 
 const data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+const data2 = [1000, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200];
 
 export default function ListScreen(_: Props) {
   const ref = useGestureHandlerRef();
+  const scrollRef = createRef<ScrollView>();
 
-  const tapRef = createRef<TapGestureHandler>();
   const {width} = useWindowDimensions();
 
   const startingX = useSharedValue<number>(0);
   const offsetX = useSharedValue<number>(0);
   const accOffsets = useSharedValue<number>(0);
 
-  const [wf, setWf] = useState<any>([]);
+  const [posn, setPosn] = useState<number>(0);
 
-  const lezSet = () => setWf([ref]);
-  const lezUnset = () => setWf([]);
+  const wf = useRef<[typeof ref] | []>([]);
+
+  const lezSet = () => (wf.current = [ref]);
+  const lezUnset = () => (wf.current = []);
+
+  const lezUnset2 = () => {
+    scrollRef.current?.setNativeProps({scrollEnabled: false});
+  };
+
+  const lezSet2 = () => {
+    scrollRef.current?.setNativeProps({scrollEnabled: true});
+  };
 
   const panning = Gesture.Pan()
     .onTouchesDown((e, sm) => {
-      console.log('touch down');
       startingX.value = e.changedTouches[0].absoluteX;
     })
     .onTouchesMove((e, sm) => {
-      console.log('move');
       const oX = e.changedTouches[0].absoluteX - startingX.value;
-      if (accOffsets.value + oX > 0) {
+      if (accOffsets.value + oX > 0 && posn === 0) {
+        console.log('1');
         accOffsets.value = 0;
         offsetX.value = 0;
         sm.fail();
-        runOnJS(lezSet)();
+        runOnJS(lezUnset2)();
       } else {
+        console.log('2');
         offsetX.value = oX;
-        runOnJS(lezUnset)();
+        runOnJS(lezSet2)();
       }
     });
 
   return (
-    <PanGestureHandler simultaneousHandlers={[ref]}>
-      <GestureDetector gesture={panning}>
-        <ScrollView
-          horizontal
-          bounces={false}
-          waitFor={wf}
-          snapToInterval={width}
-          onMomentumScrollEnd={e => {
-            if (e.nativeEvent.contentOffset.x === 0) {
-              lezSet();
-            }
-          }}
-          onScrollEndDrag={e => {
-            if (e.nativeEvent.contentOffset.x === 0) {
-              lezSet();
-            }
-          }}
-          decelerationRate="fast"
-          snapToAlignment="start"
-          showsHorizontalScrollIndicator={false}>
-          <FlatList data={data} renderItem={renderItem} style={{width}} />
-          <FlatList data={data} renderItem={renderItem} style={{width}} />
-        </ScrollView>
-      </GestureDetector>
-    </PanGestureHandler>
+    <GestureDetector gesture={panning}>
+      <ScrollView
+        horizontal
+        bounces={false}
+        ref={scrollRef}
+        snapToInterval={width}
+        onMomentumScrollEnd={e => {
+          setPosn(e.nativeEvent.contentOffset.x);
+        }}
+        onScrollEndDrag={e => {
+          setPosn(e.nativeEvent.contentOffset.x);
+        }}
+        decelerationRate="fast"
+        snapToAlignment="start"
+        showsHorizontalScrollIndicator={false}>
+        <FlatList data={data} renderItem={renderItem} style={{width}} />
+        <FlatList data={data2} renderItem={renderItem} style={{width}} />
+      </ScrollView>
+    </GestureDetector>
   );
 }
 
