@@ -34,22 +34,6 @@ const App = () => {
               gestureResponseDistance: width,
             }}
           />
-          <Stack.Screen
-            name="AnimatedList"
-            component={AnimatedListScreen}
-            options={{
-              gestureEnabled: true,
-              gestureResponseDistance: width,
-            }}
-          />
-          <Stack.Screen
-            name="List3"
-            component={List3Screen}
-            options={{
-              gestureEnabled: true,
-              gestureResponseDistance: width,
-            }}
-          />
         </Stack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>

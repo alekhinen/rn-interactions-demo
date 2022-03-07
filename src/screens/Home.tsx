@@ -28,22 +28,6 @@ export function HomeScreen() {
       );
     }
 
-    if (info.index === 1) {
-      return (
-        <Pressable onPress={() => navigate('AnimatedList')}>
-          <Text>Go To Animated List</Text>
-        </Pressable>
-      );
-    }
-
-    if (info.index === 2) {
-      return (
-        <Pressable onPress={() => navigate('List3')}>
-          <Text>Go To Animated List 3</Text>
-        </Pressable>
-      );
-    }
-
     return (
       <View
         style={{
